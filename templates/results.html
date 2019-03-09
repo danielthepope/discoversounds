@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Discover Sounds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container">
+    <h1>Discover Sounds</h1>
+    <p><a href="/">Back to search</a></p>
+    <p>Looking for {{ artists_query|join(', ')}}.</p>
+    {% if results|length == 0 %}
+    <p>No results found</p>
+    {% else %}
+    {% for result in results %}
+    <div class="well">
+      <p><strong><a href="{{result.programmes_url}}">{{ result.title }}</a></strong></p>
+      <p>From {{ result.service }}</p>
+      <p>Matched artists: <strong>{{ result.artists|join(', ') }}</strong></p>
+      <p>Also features songs by {{ result.other_artists|join(', ') }}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</body>
+</html>
