@@ -42,9 +42,9 @@ def update_artists():
             artist_representations[sanitised_artist] = list([artist])
     ARTIST_KEYS = artist_representations.keys()
     for key in ARTIST_KEYS:
-        most_common_name = collections.Counter(artist_representations[key]).most_common()[0][0]
+        names = [a[0] for a in collections.Counter(artist_representations[key]).most_common()]
         popularity = len(artist_representations[key])
-        ARTIST_NAMES[key] = (most_common_name, popularity)
+        ARTIST_NAMES[key] = (names, popularity)
 
 
 class Search(Resource):
@@ -76,7 +76,7 @@ def find_artists(term):
     all_matches = [ARTIST_NAMES[a] for a in ARTIST_KEYS if sanitised in a]
     # Sort by popularity
     all_matches.sort(key=lambda a: a[1], reverse=True)
-    return [a[0] for a in all_matches][0:15]
+    return [a[0][0] for a in all_matches][0:15]
 
 
 @app.route('/')
@@ -98,7 +98,7 @@ def shutdown_session(exception=None):
 @timeit
 def find_shows(artists_query):
     sanitised_query = set(map(sanitise_artist, artists_query))
-    full_artist_names = reduce(list.__add__, [ARTIST_NAMES[key] for key in sanitised_query])
+    full_artist_names = reduce(list.__add__, [ARTIST_NAMES[key][0] for key in sanitised_query])
     vpids_and_artist = ShowToArtist.query.filter(
         ShowToArtist.artist.in_(full_artist_names)).all()
     if len(vpids_and_artist) == 0:
