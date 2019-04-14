@@ -10,21 +10,21 @@ Given any number of artists to search for, this service will find a radio show a
 virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
+pip install .
 ```
 
 ## How do I run it?
 
-If you have an alternative data source for `shows.csv` and `show_to_artist.csv`, put their location in a file called `.env`. The file could look something like this:
+If you have an alternative data source for `radio-sample.db`, put its connection string in a file called `.env`. The file could look something like this:
 
 ```
-SHOWS_CSV=data/shows.csv
-SHOW_TO_ARTIST_CSV=data/vpid_to_artist.csv
+DATABASE=sqlite:///data/radio.db
 ```
 
 Start the server using
 
 ```
-python server.py
+python discoversounds/server.py
 ```
 
 The server runs on port 5002 by default. This can be overridden by setting the environment variable `PORT` in the `.env` file.

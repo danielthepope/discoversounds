@@ -18,7 +18,7 @@
     {% for result in results %}
     <div class="well">
       <p><strong><a href="{{result.programmes_url}}">{{ result.title }}</a></strong></p>
-      <p>From {{ result.service }}</p>
+      <p>From {{ result.sid }}</p>
       <p>Matched artists: <strong>{{ result.artists|join(', ') }}</strong></p>
       <p>Also features songs by {{ result.other_artists|join(', ') }}</p>
     </div>
