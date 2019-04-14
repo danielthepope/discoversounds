@@ -42,7 +42,9 @@ def update_artists():
             artist_representations[sanitised_artist] = list([artist])
     ARTIST_KEYS = artist_representations.keys()
     for key in ARTIST_KEYS:
-        ARTIST_NAMES[key] = [a[0] for a in collections.Counter(artist_representations[key]).most_common()]
+        most_common_name = collections.Counter(artist_representations[key]).most_common()[0][0]
+        popularity = len(artist_representations[key])
+        ARTIST_NAMES[key] = (most_common_name, popularity)
 
 
 class Search(Resource):
@@ -71,7 +73,10 @@ class Artists(Resource):
 @timeit
 def find_artists(term):
     sanitised = sanitise_artist(term)
-    return sorted([ARTIST_NAMES[a][0] for a in ARTIST_KEYS if sanitised in a])[0:20]
+    all_matches = [ARTIST_NAMES[a] for a in ARTIST_KEYS if sanitised in a]
+    # Sort by popularity
+    all_matches.sort(key=lambda a: a[1], reverse=True)
+    return [a[0] for a in all_matches][0:15]
 
 
 @app.route('/')
