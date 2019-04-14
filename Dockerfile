@@ -10,4 +10,4 @@ RUN pip install "."
 
 ENV HOST=0.0.0.0
 EXPOSE 5002
-ENTRYPOINT [ "python", "discoversounds/server.py" ]
+ENTRYPOINT [ "python", "-u", "discoversounds/server.py" ]
