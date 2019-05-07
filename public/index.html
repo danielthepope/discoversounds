@@ -13,28 +13,18 @@
     <!-- F**k yeah, Bootstrap. -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
     <!-- F**k yeah, jQuery. -->
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/selectize.bootstrap3.css">
+    <script src="js/selectize.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1><img class="icon" src="header-icon-small.png" alt="icon"> Discover Sounds</h1>
-        <p>Find shows on BBC Sounds you never knew existed.</p>
-        <form action="search" method="GET" class="col-sm-6 col-md-4">
-            <div class="form-group">
-                <input id="artist_1" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_2" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_3" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_4" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_5" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_6" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_7" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_8" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_9" type="text" name="artist" placeholder="artist" class="form-control">
-                <input id="artist_10" type="text" name="artist" placeholder="artist" class="form-control">
-            </div>
+        <h1><img class="icon" src="header-icon-small.png" alt=""> Discover Sounds</h1>
+        <p class="lead">Find shows on BBC Sounds you never knew existed.</p>
+        <form action="search" method="GET">
+            <select name="artist" id="multi-input" placeholder="Type artist names here" multiple="multiple" class="form-control"></select>
+
             <p>Return:</p>
             <div class="checkbox">
                 <label for="radio_html">
@@ -57,21 +47,37 @@
             </div>
             <input class="btn btn-primary" type="submit" value="Go!">
         </form>
-        <div class="col-sm-6 col-md-6 col-xs-12">
-            <h2>What is this?</h2>
-            <p>I indexed the artists played on all BBC radio stations from mid-January to mid-February.</p>
-            <p>Submit up to 10 of your favourite artists and this service will find a radio show that plays most of them. The more artists you provide, the better the results will be.</p>
-            <p>For example, if you submit The Strokes, Muse, Queens of the Stone Age and The White Stripes, you'll get <a href="https://www.bbc.co.uk/programmes/m00021nz">this episode</a> of Radio 1's Indie Show back.</p>
-            <p>Created by <a href="https://twitter.com/danielthepope">Dan Pope</a> as part of a BBC hack day.</p>
-        </div>
+        <hr>
+        <h2>What is this?</h2>
+        <p>I indexed the artists played on all BBC radio stations from mid-January to mid-February.</p>
+        <p>Choose your favourite artists and this service will find a radio show that plays most of them. The more artists you provide, the better the results will be.</p>
+        <p>For example, if you submit The Strokes, Muse, Queens of the Stone Age and The White Stripes, you'll get <a href="https://www.bbc.co.uk/programmes/m00021nz">this episode</a> of Radio 1's Indie Show back.</p>
+        <p>An <a href="https://github.com/danielthepope/discoversounds">open source project</a> created by <a href="https://twitter.com/danielthepope">Dan Pope</a> as part of a BBC hack day.</p>
     </div>
     <script>
-        $( function() {
-            $( "input[name=artist]" ).autocomplete({
-                source: '/artists',
-                minLength: 4
-            });
-        } );
+        $('#multi-input').selectize({
+            valueField: 'name',
+            labelField: 'name',
+            searchField: ['name'],
+            create: false,
+            persist: false,
+            closeAfterSelect: true,
+            load: function(query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '/artists?term=' + encodeURIComponent(query),
+                    type: 'GET',
+                    error: function() {
+                        console.log('error')
+                        callback();
+                    },
+                    success: function(res) {
+                        console.log(res);
+                        callback(res.map(function(a) {return {name: a}}));
+                    }
+                })
+            }
+        });
     </script>
 </body>
 </html>

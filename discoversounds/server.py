@@ -65,7 +65,7 @@ class Search(Resource):
 class Artists(Resource):
     def get(self):
         term = request.args.get('term')
-        if len(term) < 4:
+        if len(term) < 2:
             return [], 404
         return find_artists(term)
 

@@ -5,11 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Discover Sounds</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
   <div class="container">
-    <h1>Discover Sounds</h1>
+    <h1><img class="icon" src="header-icon-small.png" alt=""> Discover Sounds</h1>
     <p><a href="/">Back to search</a></p>
     <p>Looking for {{ artists_query|join(', ')}}.</p>
     {% if results|length == 0 %}
