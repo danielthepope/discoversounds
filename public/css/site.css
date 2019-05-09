@@ -1,5 +1,21 @@
-.container {
+body {
     max-width: 800px;
+    margin: auto;
+    font-family: sans-serif;
+    color: #333;
+    line-height: 1.5;
+    padding: 0 2rem;
+}
+
+h1, h2 {
+    font-weight: normal;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
+
+img {
+    vertical-align: middle;
 }
 
 h1 {
@@ -9,10 +25,80 @@ h1 {
     text-align: center;
 }
 
+form {
+    display: block;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+a {
+    color: #ca3600;
+    text-decoration: none;
+}
+
+a:focus, a:hover {
+    color: #a32c00;
+    text-decoration: underline;
+}
+
+label {
+    padding-left: 20px;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 0.3rem;
+}
+
+label small {
+    padding-left: 20px;
+}
+
+input[type=radio] {
+    margin: 4px 0 0;
+}
+
+.btn {
+    cursor: pointer;
+    color: #fff;
+    background-color: #ca3600;
+    padding: 0.7rem 1.2rem;
+    margin-top: 1rem;
+    margin-left: 20px;
+    border: 0;
+    border-radius: 3px;
+    font-size: 1rem;
+}
+
+.btn:focus, .btn:hover {
+    background-color: #a32c00;
+}
+
+hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
 .lead {
     text-align: center;
+    font-size: 1.3rem;
 }
 
 .icon {
     height: 50px;
+}
+
+.selectize-input input, .selectize-input .item {
+    font-size: 1rem;
+}
+
+.well {
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #f5f5f5;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
 }
