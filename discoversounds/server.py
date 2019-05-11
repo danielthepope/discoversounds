@@ -11,7 +11,7 @@ from flask import Flask, Response, jsonify, redirect, render_template, request
 from flask_restful import Api, Resource
 from sqlalchemy import not_
 
-from discoversounds.database import db_session
+from discoversounds.database import db_session, init_db
 from discoversounds.helpers import sanitise_artist, set_interval, timeit
 from discoversounds.models import Show, ShowToArtist
 
@@ -126,6 +126,7 @@ if __name__ == '__main__':
     api = Api(app)
     api.add_resource(Search, '/search')
     api.add_resource(Artists, '/artists')
+    init_db()
 
     set_interval(update_artists, 600)
     update_artists()
