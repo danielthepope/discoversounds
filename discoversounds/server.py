@@ -20,6 +20,7 @@ app = Flask(__name__, static_folder='../public', static_url_path='')
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 PROGRAMMES_URL = Template('https://www.bbc.co.uk/programmes/$show')
+SOUNDS_URL = Template('https://www.bbc.co.uk/sounds/play/$show')
 IMAGE_URL = Template('https://ichef.bbci.co.uk/images/ic/160x90/$ipid.jpg')
 
 ARTIST_KEYS = []
@@ -58,7 +59,7 @@ class Search(Resource):
         if len(results) == 0:
             return 'No results found', 404
         if redir == 'programmes':
-            return redirect(random.choice(results)['programmes_url'])
+            return redirect(random.choice(results)['sounds_url'])
         return jsonify(results)
 
 
@@ -111,14 +112,21 @@ def find_shows(artists_query):
     for counter_result in good_vpids:
         vpid = counter_result[0]
         show = Show.query.get(vpid)
-        extra_info = {
+        display_item = {
             'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
             'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
             'count': count,
             'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
+            'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
             'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
+            'availability_from': show.availability_from,
+            'availability_to': show.availability_to,
+            'synopsis': show.synopsis,
+            'sid': show.sid,
+            'title': show.title,
+            'vpid': show.vpid,
         }
-        response.append({**show.__dict__, **extra_info})
+        response.append(display_item)
     print([result['programmes_url'] for result in response])
     return response
 
