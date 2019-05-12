@@ -18,7 +18,8 @@
 </head>
 <body>
     <h1><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</h1>
-    <p class="lead">Find shows on BBC Sounds you never knew existed.</p>
+    <p class="lead center">Find shows on BBC Sounds you never knew existed.</p>
+    <p class="center"><small><span class="separate inline">{{stats.show_count}} shows</span><span class="separate inline">{{stats.artist_count}} artists</span><span class="separate inline">Updated {{stats.last_update}}</span></small></p>
     <form action="search" method="GET">
         <select name="artist" id="multi-input" placeholder="Type artist names here" multiple="multiple" class="form-control"></select>
 
@@ -39,7 +40,7 @@
             <label for="radio_programmes">
                 <input type="radio" class="form-check-input" name="redirect" value="programmes" id="radio_programmes">
                 I'm feeling lucky<br>
-                <small>If there are multiple matches, this will take you to a random match on BBC Sounds</small>
+                <small class="inline">If there are multiple matches, this will take you to a random match on BBC Sounds</small>
             </label>
         </div>
         <input class="btn" type="submit" value="Go!">

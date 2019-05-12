@@ -86,8 +86,15 @@ hr {
 }
 
 .lead {
-    text-align: center;
     font-size: 1.3rem;
+}
+
+.center {
+    text-align: center;
+}
+
+.separate {
+    padding: 0 1rem;
 }
 
 .icon {

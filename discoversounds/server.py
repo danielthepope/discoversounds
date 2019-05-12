@@ -25,6 +25,7 @@ IMAGE_URL = Template('https://ichef.bbci.co.uk/images/ic/160x90/$ipid.jpg')
 
 ARTIST_KEYS = []
 ARTIST_NAMES = {}
+STATS = {}
 
 
 @timeit
@@ -46,6 +47,23 @@ def update_artists():
         names = [a[0] for a in collections.Counter(artist_representations[key]).most_common()]
         popularity = len(artist_representations[key])
         ARTIST_NAMES[key] = (names, popularity)
+
+@timeit
+def update_stats():
+    global STATS
+    rs = db_session().execute('select shows.availability_from from shows order by availability_from desc limit 1')
+    for row in rs:
+        STATS['last_update'] = row[0][:-7]
+    rs = db_session().execute('select count(vpid) from shows')
+    for row in rs:
+        STATS['show_count'] = row[0]
+    STATS['artist_count'] = len(ARTIST_KEYS)
+    db_session.remove()
+
+
+def update():
+    update_artists()
+    update_stats()
 
 
 class Search(Resource):
@@ -82,7 +100,7 @@ def find_artists(term):
 
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return Response(render_template('index.html', stats=STATS), mimetype='text/html')
 
 
 @app.after_request
@@ -137,8 +155,8 @@ if __name__ == '__main__':
     api.add_resource(Artists, '/artists')
     init_db()
 
-    set_interval(update_artists, 600)
-    update_artists()
+    set_interval(update, 300)
+    update()
     port = os.getenv('PORT') or 5002
     print('PORT', port)
     host = os.getenv('HOST') or '127.0.0.1'
