@@ -19,8 +19,8 @@ from discoversounds.models import Show, ShowToArtist
 app = Flask(__name__, static_folder='../public', static_url_path='')
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
-programmes_url = Template('https://www.bbc.co.uk/programmes/$show')
-
+PROGRAMMES_URL = Template('https://www.bbc.co.uk/programmes/$show')
+IMAGE_URL = Template('https://ichef.bbci.co.uk/images/ic/160x90/$ipid.jpg')
 
 ARTIST_KEYS = []
 ARTIST_NAMES = {}
@@ -109,15 +109,16 @@ def find_shows(artists_query):
     good_vpids = [counter_result for counter_result in counter.items() if counter_result[1] == count][0:10]  # Up to 10 of the best matches
     response = list()
     for counter_result in good_vpids:
-        show = counter_result[0]
+        vpid = counter_result[0]
+        show = Show.query.get(vpid)
         extra_info = {
-            'artists': [a.artist for a in vpids_and_artist if a.vpid == show],
-            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == show, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
+            'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
+            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
             'count': count,
-            'programmes_url': programmes_url.substitute({'show': show}),
+            'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
+            'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
         }
-        response.append(
-            {**db_session().query(Show).get(show).__dict__, **extra_info})
+        response.append({**show.__dict__, **extra_info})
     print([result['programmes_url'] for result in response])
     return response
 

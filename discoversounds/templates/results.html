@@ -18,10 +18,20 @@
     {% else %}
     {% for result in results %}
     <div class="well">
-      <p><strong><a href="{{result.programmes_url}}">{{ result.title }}</a></strong></p>
-      <p>From {{ result.sid }}</p>
-      <p>Matched artists: <strong>{{ result.artists|join(', ') }}</strong></p>
-      <p>Also features songs by {{ result.other_artists|join(', ') }}</p>
+      <div>
+        <div class="left inline">
+          <a href="{{result.programmes_url}}">
+            <img src="{{result.image_url}}" alt="">
+          </a>
+        </div>
+        <div class="inline">
+          <p><strong><a href="{{result.programmes_url}}">{{ result.title }}</a></strong></p>
+          <p>From {{ result.sid }}</p>
+          <p>Matched artists: <strong>{{ result.artists|join(', ') }}</strong></p>
+        </div>
+      </div>
+      <p>{{result.synopsis}}</p>
+      <p><small>Also features songs by {{ result.other_artists|join(', ') }}</small></p>
     </div>
     {% endfor %}
     {% endif %}
