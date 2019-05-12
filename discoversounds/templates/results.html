@@ -9,32 +9,31 @@
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-  <div class="container">
-    <h1><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</h1>
-    <p><a href="/">Back to search</a></p>
-    <p>Looking for {{ artists_query|join(', ')}}.</p>
-    {% if results|length == 0 %}
-    <p>No results found</p>
-    {% else %}
-    {% for result in results %}
-    <div class="well">
-      <div>
-        <div class="left inline">
-          <a href="{{result.programmes_url}}">
-            <img src="{{result.image_url}}" alt="">
-          </a>
-        </div>
-        <div class="inline">
-          <p><strong><a href="{{result.programmes_url}}">{{ result.title }}</a></strong></p>
-          <p>From {{ result.sid }}</p>
-          <p>Matched artists: <strong>{{ result.artists|join(', ') }}</strong></p>
-        </div>
+  <h1><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</h1>
+  <p><a href="/">Back to search</a></p>
+  <p>Looking for {{ artists_query|join(', ')}}.</p>
+  {% if results|length == 0 %}
+  <p>No results found</p>
+  {% else %}
+  {% for result in results %}
+  <div class="well">
+    <div>
+      <div class="left inline">
+        <a href="{{result.programmes_url}}">
+          <img src="{{result.image_url}}" alt="">
+        </a>
       </div>
-      <p>{{result.synopsis}}</p>
-      <p><small>Also features songs by {{ result.other_artists|join(', ') }}</small></p>
+      <div class="inline">
+        <p><strong><a href="{{result.programmes_url}}">{{ result.title }}</a></strong></p>
+        <p>From {{ result.sid }}</p>
+        <p>Matched artists: <strong>{{ result.artists|join(', ') }}</strong></p>
+      </div>
     </div>
-    {% endfor %}
-    {% endif %}
+    <p>{{result.synopsis}}</p>
+    <p><small>Also features songs by {{ result.other_artists|join(', ') }}</small></p>
   </div>
+  {% endfor %}
+  {% endif %}
+  <p>An <a href="https://github.com/danielthepope/discoversounds">open source project</a> created by <a href="https://twitter.com/danielthepope">Dan Pope</a> as part of a BBC hack day.</p>
 </body>
 </html>

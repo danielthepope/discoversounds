@@ -94,6 +94,10 @@ hr {
     height: 50px;
 }
 
+.selectize-control {
+    margin: 1rem 0;
+}
+
 .selectize-input input, .selectize-input .item {
     font-size: 1rem;
 }
