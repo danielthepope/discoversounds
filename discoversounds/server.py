@@ -125,11 +125,13 @@ def find_shows(artists_query):
     just_vpids = [a.vpid for a in vpids_and_artist]
     counter = collections.Counter(just_vpids)
     count = max(counter.values())
-    good_vpids = [counter_result for counter_result in counter.items() if counter_result[1] == count][0:10]  # Up to 10 of the best matches
+    good_vpids = [counter_result for counter_result in counter.items() if counter_result[1] == count]
+    good_shows = [Show.query.get(vpid[0]) for vpid in good_vpids]
+    good_shows.sort(key=lambda show: show.availability_from, reverse=True)
+    shows_to_display = good_shows[0:10]  # Up to 10 of the best matches
     response = list()
-    for counter_result in good_vpids:
-        vpid = counter_result[0]
-        show = Show.query.get(vpid)
+    for show in shows_to_display:
+        vpid = show.vpid
         display_item = {
             'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
             'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
@@ -137,7 +139,7 @@ def find_shows(artists_query):
             'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
             'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
             'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
-            'availability_from': show.availability_from,
+            'availability_from': show.availability_from.strftime('%d %b'),
             'availability_to': show.availability_to,
             'synopsis': show.synopsis,
             'sid': show.sid,
