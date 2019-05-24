@@ -31,7 +31,10 @@
       </div>
     </div>
     <p>{{result.synopsis}}</p>
-    <p><small>Also features songs by {{ result.other_artists|join(', ') }}</small></p>
+    <details>
+      <summary>Other artists played</summary>
+      <p><small>{{ result.other_artists|join(', ') }}</small></p>
+    </details>
   </div>
   {% endfor %}
   {% endif %}

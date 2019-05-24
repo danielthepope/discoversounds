@@ -125,3 +125,7 @@ hr {
 .inline {
     display: inline-block;
 }
+
+summary {
+    cursor: pointer;
+}
