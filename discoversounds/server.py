@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import collections
+from datetime import datetime
 import os
 import random
 from functools import reduce
@@ -53,7 +54,8 @@ def update_stats():
     global STATS
     rs = db_session().execute('select shows.availability_from from shows order by availability_from desc limit 1')
     for row in rs:
-        STATS['last_update'] = row[0][:-7]
+        last_update = datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f')
+        STATS['last_update'] = last_update.strftime('%d %b %Y %H:%M')
     rs = db_session().execute('select count(vpid) from shows')
     for row in rs:
         STATS['show_count'] = row[0]
