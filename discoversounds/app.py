@@ -153,14 +153,15 @@ def find_shows(artists_query):
     return response
 
 
-if __name__ == '__main__':
-    api = Api(app)
-    api.add_resource(Search, '/search')
-    api.add_resource(Artists, '/artists')
-    init_db()
+api = Api(app)
+api.add_resource(Search, '/search')
+api.add_resource(Artists, '/artists')
+init_db()
 
-    set_interval(update, 300)
-    update()
+set_interval(update, 300)
+update()
+
+if __name__ == '__main__':
     port = os.getenv('PORT') or 5002
     print('PORT', port)
     host = os.getenv('HOST') or '127.0.0.1'

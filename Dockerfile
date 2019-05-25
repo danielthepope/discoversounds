@@ -1,13 +1,12 @@
 FROM python:3
 
 WORKDIR /usr/src/app
-# We copy just the requirements.txt first to leverage Docker cache
-COPY ./requirements.txt .
+# We copy just setup.py first to leverage Docker cache when installing requirements
+COPY ./setup.py .
+RUN pip install ".[prod,test]"
 
-RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN pip install "."
+RUN pip install -e "."
 
-ENV HOST=0.0.0.0
-EXPOSE 5002
-ENTRYPOINT [ "python", "-u", "discoversounds/server.py" ]
+EXPOSE 8000
+ENTRYPOINT [ "gunicorn", "--bind", "0.0.0.0:8000", "discoversounds.app:app" ]

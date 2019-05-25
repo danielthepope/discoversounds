@@ -9,8 +9,15 @@ Given any number of artists to search for, this service will find a radio show a
 ```
 virtualenv venv
 source venv/bin/activate
-pip install -r requirements.txt
-pip install .
+pip install -e "."
+```
+
+### Other dependencies
+
+If running in production, running tests or editing the code, you'll want to install other optional dependencies.
+
+```
+pip install -e ".[dev,test,prod]"
 ```
 
 ## How do I run it?
@@ -24,7 +31,21 @@ DATABASE=sqlite:///data/radio.db
 Start the server using
 
 ```
-python discoversounds/server.py
+python discoversounds/app.py
 ```
 
 The server runs on port 5002 by default. This can be overridden by setting the environment variable `PORT` in the `.env` file.
+
+### Running in production
+
+You can run gunicorn if you installed the `prod` optional dependencies.
+
+```
+gunicorn --bind 127.0.0.1:8000 discoversounds.app:app
+```
+
+This will run it on localhost port 8000.
+
+## How is the database updated?
+
+In production, another script polls the Sounds API to keep the database updated with new shows. That bit is in a private repo.
