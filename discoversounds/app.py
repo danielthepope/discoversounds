@@ -17,7 +17,7 @@ from discoversounds.helpers import sanitise_artist, set_interval, timeit
 from discoversounds.models import Show, ShowToArtist
 
 
-app = Flask(__name__, static_folder='../public', static_url_path='')
+app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 PROGRAMMES_URL = Template('https://www.bbc.co.uk/programmes/$show')
