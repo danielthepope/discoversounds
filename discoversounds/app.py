@@ -158,7 +158,11 @@ api.add_resource(Search, '/search')
 api.add_resource(Artists, '/artists')
 init_db()
 
-set_interval(update, 300)
+if os.getenv('REFRESH_DATA'):
+    print('Updating data every 5 minutes')
+    set_interval(update, 300)
+else:
+    print('REFRESH_DATA is not set: artists only collected once')
 update()
 
 if __name__ == '__main__':
