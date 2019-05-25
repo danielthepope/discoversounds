@@ -8,5 +8,6 @@ RUN pip install ".[prod,test]"
 COPY . .
 RUN pip install -e "."
 
+ENV PYTHONUNBUFFERED TRUE
 EXPOSE 8000
 ENTRYPOINT [ "gunicorn", "--bind", "0.0.0.0:8000", "discoversounds.app:app" ]
