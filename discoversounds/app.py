@@ -119,7 +119,12 @@ def shutdown_session(exception=None):
 @timeit
 def find_shows(artists_query):
     sanitised_query = set(map(sanitise_artist, artists_query))
-    full_artist_names = reduce(list.__add__, [ARTIST_NAMES[key][0] for key in sanitised_query])
+    full_artist_names = list()
+    for key in sanitised_query:
+        if key in ARTIST_NAMES:
+            full_artist_names += ARTIST_NAMES[key][0]
+        else:
+            full_artist_names.append(key)
     vpids_and_artist = ShowToArtist.query.filter(
         ShowToArtist.artist.in_(full_artist_names)).all()
     if len(vpids_and_artist) == 0:
