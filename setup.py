@@ -21,6 +21,7 @@ setup(
             'gunicorn==19.9.0'
         ],
         'test': [
+            'pyquery==1.4.0',
             'pytest==4.5.0'
         ]
     },
