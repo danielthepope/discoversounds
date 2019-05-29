@@ -3,6 +3,7 @@ load_dotenv()
 
 import collections
 from datetime import datetime
+import logging as log
 import os
 import random
 from functools import reduce
@@ -16,6 +17,7 @@ from discoversounds.database import db_session, init_db
 from discoversounds.helpers import sanitise_artist, set_interval, timeit
 from discoversounds.models import Show, ShowToArtist
 
+log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG)
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -72,7 +74,7 @@ class Search(Resource):
     def get(self):
         artists_query = [a for a in request.args.getlist('artist') if a != '']
         redir = request.args.get('redirect')
-        print('Looking for ' + str(artists_query))
+        log.info('Looking for %s', str(artists_query))
         results = find_shows(artists_query)
         if redir == 'html':
             return Response(render_template('results.html', results=results, artists_query=artists_query), mimetype='text/html')
@@ -154,7 +156,7 @@ def find_shows(artists_query):
             'vpid': show.vpid,
         }
         response.append(display_item)
-    print([result['programmes_url'] for result in response])
+    log.info([result['programmes_url'] for result in response])
     return response
 
 
@@ -164,15 +166,15 @@ api.add_resource(Artists, '/artists')
 init_db()
 
 if os.getenv('REFRESH_DATA'):
-    print('Updating data every 5 minutes')
+    log.info('Updating data every 5 minutes')
     set_interval(update, 300)
 else:
-    print('REFRESH_DATA is not set: artists only collected once')
+    log.warn('REFRESH_DATA is not set: artists only collected once')
 update()
 
 if __name__ == '__main__':
     port = os.getenv('PORT') or 5002
-    print('PORT', port)
+    log.info('PORT %s', port)
     host = os.getenv('HOST') or '127.0.0.1'
-    print('HOST', host)
+    log.info('HOST %s', host)
     app.run(port=port, host=host)

@@ -1,7 +1,9 @@
+import logging as log
 import threading
 import time
 from unidecode import unidecode
 
+log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG)
 
 def sanitise_artist(artist):
     return unidecode(artist).lower().replace(' ', '').replace('.', '').replace(',', '').replace('&', 'and').replace("'", '').replace('"', '').replace('/', '').replace('-', '')
@@ -21,7 +23,7 @@ def timeit(function):
         start_time = time.time()
         result = function(*args, **kw)
         end_time = time.time()
-        print('%r %r %r  %2.2f ms' %
-              (function.__name__, args, kw, (end_time - start_time) * 1000))
+        log.debug('%r %r %r  %2.2f ms',
+              function.__name__, args, kw, (end_time - start_time) * 1000)
         return result
     return timed
