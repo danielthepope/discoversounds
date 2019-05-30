@@ -73,16 +73,19 @@ def update():
 class Search(Resource):
     def get(self):
         artists_query = [a for a in request.args.getlist('artist') if a != '']
-        redir = request.args.get('redirect')
+        output_type = request.headers.get('Accept')
         log.info('Looking for %s', str(artists_query))
         results = find_shows(artists_query)
-        if redir == 'html':
-            return Response(render_template('results.html', results=results, artists_query=artists_query), mimetype='text/html')
-        if len(results) == 0:
-            return 'No results found', 404
-        if redir == 'programmes':
+        # Return JSON
+        if output_type == 'application/json':
+            if len(results) == 0:
+                return 'No results found', 404
+            return jsonify(results)
+        # Redirect to Sounds
+        if request.args.get('redirect'):
             return redirect(random.choice(results)['sounds_url'])
-        return jsonify(results)
+        # Return HTML
+        return Response(render_template('results.html', results=results, artists_query=artists_query), mimetype='text/html')
 
 
 class Artists(Resource):
@@ -105,12 +108,6 @@ def find_artists(term):
 @app.route('/')
 def index():
     return Response(render_template('index.html', stats=STATS), mimetype='text/html')
-
-
-@app.after_request
-def add_header(response):
-    response.headers['Cache-Control'] = 'public, max-age=600'
-    return response
 
 
 @app.teardown_appcontext
@@ -169,7 +166,7 @@ if os.getenv('REFRESH_DATA'):
     log.info('Updating data every 5 minutes')
     set_interval(update, 300)
 else:
-    log.warn('REFRESH_DATA is not set: artists only collected once')
+    log.warning('REFRESH_DATA is not set: artists only collected once')
 update()
 
 if __name__ == '__main__':

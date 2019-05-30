@@ -23,28 +23,10 @@
     <p class="center"><small><span class="separate inline">{{stats.show_count}} shows</span><span class="separate inline">{{stats.artist_count}} artists</span><span class="separate inline">Updated {{stats.last_update}}</span></small></p>
     <form action="search" method="GET">
         <select name="artist" id="multi-input" placeholder="Type artist names here" multiple="multiple" class="form-control"></select>
-
-        <p>Return:</p>
-        <div class="checkbox">
-            <label for="radio_html">
-                <input type="radio" class="form-check-input" name="redirect" value="html" id="radio_html" checked>
-                Up to 10 results
-            </label>
+        <div class="center">
+            <input class="btn" type="submit" value="Search">
+            <input class="btn" type="submit" value="Play something now" name="redirect">
         </div>
-        <div class="checkbox">
-            <label for="radio_none">
-                <input type="radio" class="form-check-input" name="redirect" value="none" id="radio_none">
-                Up to 10 results (JSON)
-            </label>
-        </div>
-        <div class="checkbox">
-            <label for="radio_programmes">
-                <input type="radio" class="form-check-input" name="redirect" value="programmes" id="radio_programmes">
-                I'm feeling lucky<br>
-                <small class="inline">If there are multiple matches, this will take you to a random match on BBC Sounds</small>
-            </label>
-        </div>
-        <input class="btn" type="submit" value="Go!">
     </form>
     <hr>
     <h2>What is this?</h2>

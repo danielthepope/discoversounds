@@ -13,9 +13,14 @@ def test_homepage(client):
     assert response.status_code == 200
     assert b'Discover Sounds' in response.data
 
-def test_unknown_artist(client):
+def test_unknown_artist_html(client):
     response = client.get('/search?artist=sasdf', headers={'Accept':'text/html'})
     assert response.status_code == 200
+    assert b'No results found' in response.data
+
+def test_unknown_artist_json(client):
+    response = client.get('/search?artist=sasdf', headers={'Accept':'application/json'})
+    assert response.status_code == 404
     assert b'No results found' in response.data
 
 def test_known_artist(client):
@@ -42,3 +47,9 @@ def test_no_accept_header(client):
     response = client.get('/search?artist=Take+That')
     d = PyQuery(response.data)
     assert d('h1')
+
+def test_redirect(client):
+    response = client.get('/search?artist=Take+That&redirect=Play+something+now')
+    assert response.status_code == 302
+    assert response.location.startswith('https://www.bbc.co.uk/sounds/play/')
+    assert not response.location.endswith('/play/')
