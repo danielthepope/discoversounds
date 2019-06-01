@@ -39,11 +39,13 @@
             valueField: 'name',
             labelField: 'name',
             searchField: ['name'],
+            score: function() { return function() { return 1 };},
             create: false,
             persist: false,
             closeAfterSelect: true,
             load: function(query, callback) {
                 if (!query.length) return callback();
+                var searchBox = this;
                 $.ajax({
                     url: '/artists?term=' + encodeURIComponent(query),
                     type: 'GET',
@@ -53,6 +55,7 @@
                     },
                     success: function(res) {
                         console.log(res);
+                        searchBox.clearOptions();
                         callback(res.map(function(a) {return {name: a}}));
                     }
                 })
