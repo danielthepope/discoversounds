@@ -61,12 +61,10 @@ label {
     margin-bottom: 0.3rem;
 }
 
-label small {
-    padding-left: 20px;
-}
-
-input[type=radio] {
+input[type=checkbox] {
     margin: 4px 0 0;
+    padding: 0.7rem 1.2rem;
+    margin: 0 0.5rem 1rem 0.5rem;
 }
 
 .btn {

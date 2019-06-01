@@ -85,9 +85,10 @@ def update():
 class Search(Resource):
     def get(self):
         artists_query = [a for a in request.args.getlist('artist') if a != '']
+        include_local = request.args.get('includelocal')
         output_type = request.headers.get('Accept')
         log.info('Looking for %s', str(artists_query))
-        results = find_shows(artists_query)
+        results = find_shows(artists_query, include_local)
         # Return JSON
         if output_type == 'application/json':
             if len(results) == 0:
@@ -97,7 +98,7 @@ class Search(Resource):
         if request.args.get('redirect'):
             return redirect(random.choice(results)['sounds_url'])
         # Return HTML
-        return Response(render_template('results.html', results=results, artists_query=artists_query), mimetype='text/html')
+        return Response(render_template('results.html', results=results, artists_query=artists_query, include_local=include_local), mimetype='text/html')
 
 
 class Artists(Resource):
@@ -119,7 +120,7 @@ def find_artists(term):
 
 @app.route('/')
 def index():
-    return Response(render_template('index.html', stats=STATS), mimetype='text/html')
+    return Response(render_template('index.html', stats=STATS, include_local=True), mimetype='text/html')
 
 
 @app.teardown_appcontext
@@ -128,7 +129,7 @@ def shutdown_session(exception=None):
 
 
 @timeit
-def find_shows(artists_query):
+def find_shows(artists_query, include_local):
     sanitised_query = set(map(sanitise_artist, artists_query))
     full_artist_names = list()
     for key in sanitised_query:
@@ -145,6 +146,8 @@ def find_shows(artists_query):
     count = max(counter.values())
     good_vpids = [counter_result for counter_result in counter.items() if counter_result[1] == count]
     good_shows = [Show.query.get(vpid[0]) for vpid in good_vpids]
+    if not include_local:
+        good_shows = [s for s in good_shows if not SERVICES[s.sid].local]
     good_shows.sort(key=lambda show: show.availability_from, reverse=True)
     shows_to_display = good_shows[0:10]  # Up to 10 of the best matches
     response = list()
