@@ -15,7 +15,7 @@ from sqlalchemy import not_
 
 from discoversounds.database import db_session, init_db
 from discoversounds.helpers import sanitise_artist, set_interval, timeit
-from discoversounds.models import Show, ShowToArtist
+from discoversounds.models import Show, ShowToArtist, Service
 
 log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG)
 
@@ -28,6 +28,7 @@ IMAGE_URL = Template('https://ichef.bbci.co.uk/images/ic/160x90/$ipid.jpg')
 
 ARTIST_KEYS = []
 ARTIST_NAMES = {}
+SERVICES = {}
 STATS = {}
 
 
@@ -52,6 +53,16 @@ def update_artists():
         ARTIST_NAMES[key] = (names, popularity)
 
 @timeit
+def update_services():
+    global SERVICES
+    all_services = Service.query.all()
+    indexed_services = {}
+    for service in all_services:
+        indexed_services[service.sid] = service
+    SERVICES = indexed_services
+    db_session.remove()
+
+@timeit
 def update_stats():
     global STATS
     rs = db_session().execute('select shows.availability_from from shows order by availability_from desc limit 1')
@@ -67,6 +78,7 @@ def update_stats():
 
 def update():
     update_artists()
+    update_services()
     update_stats()
 
 
@@ -148,7 +160,7 @@ def find_shows(artists_query):
             'availability_from': show.availability_from.strftime('%d %b'),
             'availability_to': show.availability_to,
             'synopsis': show.synopsis,
-            'sid': show.sid,
+            'sid': show.sid in SERVICES and SERVICES[show.sid].name or show.sid,
             'title': show.title,
             'vpid': show.vpid,
         }
