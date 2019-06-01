@@ -147,7 +147,7 @@ def find_shows(artists_query, include_local):
     good_vpids = [counter_result for counter_result in counter.items() if counter_result[1] == count]
     good_shows = [Show.query.get(vpid[0]) for vpid in good_vpids]
     if not include_local:
-        good_shows = [s for s in good_shows if not SERVICES[s.sid].local]
+        good_shows = [s for s in good_shows if (s.sid in SERVICES and not SERVICES[s.sid].local)]
     good_shows.sort(key=lambda show: show.availability_from, reverse=True)
     shows_to_display = good_shows[0:10]  # Up to 10 of the best matches
     response = list()
