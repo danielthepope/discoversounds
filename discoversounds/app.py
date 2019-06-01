@@ -95,7 +95,7 @@ class Search(Resource):
                 return 'No results found', 404
             return jsonify(results)
         # Redirect to Sounds
-        if request.args.get('redirect'):
+        if request.args.get('redirect') and len(results) > 0:
             return redirect(random.choice(results)['sounds_url'])
         # Return HTML
         return Response(render_template('results.html', results=results, artists_query=artists_query, include_local=include_local), mimetype='text/html')
