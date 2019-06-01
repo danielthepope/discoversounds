@@ -1,66 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Discover Sounds</title>
+    {% include 'components/head.html' %}
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#ca3600">
-    <link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
-    <link rel="stylesheet" href="css/selectize.css">
-    <link rel="stylesheet" href="css/site.css">
-    <!-- F**k yeah, jQuery. -->
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-    <script src="js/selectize.min.js"></script>
+    
 </head>
 <body>
     <h1><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</h1>
     <p class="lead center">Find shows on BBC Sounds you never knew existed.</p>
     <p class="center"><small><span class="separate inline">{{stats.show_count}} shows</span><span class="separate inline">{{stats.artist_count}} artists</span><span class="separate inline">Updated {{stats.last_update}}</span></small></p>
-    <form action="search" method="GET">
-        <select name="artist" id="multi-input" placeholder="Type artist names here" multiple="multiple" class="form-control"></select>
-        <div class="center">
-            <input class="btn" type="submit" value="Search">
-            <input class="btn" type="submit" value="Play something now" name="redirect">
-        </div>
-    </form>
+    {% include 'components/searchbox.html' %}
     <hr>
     <h2>What is this?</h2>
     <p>This site indexes the shows that are available on <a href="https://www.bbc.co.uk/sounds">BBC Sounds</a>, along with the artists that were played on each.</p>
     <p>Choose your favourite artists and this service will find a radio show that plays most of them. The more artists you provide, the better the results will be.</p>
     <p>For example, if you submit The Strokes, Muse, Queens of the Stone Age and The White Stripes, you could get <a href="https://www.bbc.co.uk/programmes/m00021nz">this episode</a> of Radio 1's Indie Show back, which played all four of them.</p>
     <p>An <a href="https://github.com/danielthepope/discoversounds">open source project</a> created by <a href="https://twitter.com/danielthepope">Dan Pope</a> as part of a BBC hack day.</p>
-    <script>
-        $('#multi-input').selectize({
-            valueField: 'name',
-            labelField: 'name',
-            searchField: ['name'],
-            score: function() { return function() { return 1 };},
-            create: false,
-            persist: false,
-            closeAfterSelect: true,
-            load: function(query, callback) {
-                if (!query.length) return callback();
-                var searchBox = this;
-                $.ajax({
-                    url: '/artists?term=' + encodeURIComponent(query),
-                    type: 'GET',
-                    error: function() {
-                        console.log('error')
-                        callback();
-                    },
-                    success: function(res) {
-                        console.log(res);
-                        searchBox.clearOptions();
-                        callback(res.map(function(a) {return {name: a}}));
-                    }
-                })
-            }
-        });
-    </script>
 </body>
 </html>

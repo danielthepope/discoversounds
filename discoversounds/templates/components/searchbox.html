@@ -1,0 +1,39 @@
+<form action="search" method="GET">
+    <select name="artist" id="multi-input" placeholder="Type artist names here" multiple="multiple" class="form-control">
+        {% for artist in artists_query %}
+        <option selected>{{artist}}</option>
+        {% endfor %}
+    </select>
+    <div class="center">
+        <input class="btn" type="submit" value="Search">
+        <input class="btn" type="submit" value="Play something now" name="redirect">
+    </div>
+</form>
+<script>
+    $('#multi-input').selectize({
+        valueField: 'name',
+        labelField: 'name',
+        searchField: ['name'],
+        score: function() { return function() { return 1 };},
+        create: false,
+        persist: false,
+        closeAfterSelect: true,
+        load: function(query, callback) {
+            if (!query.length) return callback();
+            var searchBox = this;
+            $.ajax({
+                url: '/artists?term=' + encodeURIComponent(query),
+                type: 'GET',
+                error: function() {
+                    console.log('error');
+                    callback();
+                },
+                success: function(res) {
+                    console.log(res);
+                    searchBox.clearOptions();
+                    callback(res.map(function(a) {return {name: a}}));
+                }
+            })
+        }
+    });
+</script>

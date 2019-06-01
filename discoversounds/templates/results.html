@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Discover Sounds</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ca3600">
-  <link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css">
+  {% include 'components/head.html' %}
 </head>
 <body>
-  <h1><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</h1>
-  <p><a href="/">Back to search</a></p>
-  <p>Looking for {{ artists_query|join(', ')}}.</p>
+  <h1><a href="/"><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</a></h1>
+  {% include 'components/searchbox.html' %}
+
   {% if results|length == 0 %}
   <p>No results found</p>
   {% else %}

@@ -27,12 +27,13 @@ def test_known_artist(client):
     response = client.get('/search?artist=Take+That', headers={'Accept':'text/html'})
     print(response.data)
     assert response.status_code == 200
-    assert b'Looking for Take That' in response.data
+    assert b'Take That' in response.data
 
 def test_mix_of_artists(client):
     response = client.get('/search?artist=sasdf&artist=Take+That', headers={'Accept':'text/html'})
     assert response.status_code == 200
-    assert b'Looking for sasdf, Take That' in response.data
+    assert b'sasdf' in response.data
+    assert b'Take That' in response.data
 
 def test_accept_json(client):
     response = client.get('/search?artist=Take+That', headers={'Accept': 'application/json'})

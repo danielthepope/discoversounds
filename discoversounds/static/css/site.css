@@ -22,7 +22,7 @@ div.left {
     margin-right: 1rem;
 }
 
-h1 {
+h1, h1 a {
     font-family: 'Permanent Marker', Forte, 'Marker Felt', sans-serif;
     font-size: 50px;
     color: #ff4500;
@@ -38,11 +38,14 @@ p {
 }
 
 a {
-    color: #ca3600;
     text-decoration: none;
 }
 
-a:focus, a:hover {
+p a {
+    color: #ca3600;
+}
+
+p a:focus, p a:hover {
     color: #a32c00;
     text-decoration: underline;
 }
