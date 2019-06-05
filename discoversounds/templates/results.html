@@ -2,6 +2,7 @@
 <html>
 <head>
   {% include 'components/head.html' %}
+  <meta property="og:description" content="Find shows on BBC Sounds featuring {{ artists_query|join(', ') }}">
 </head>
 <body>
   <h1><a href="/"><img class="icon" src="header-icon-small.jpg" alt=""> Discover Sounds</a></h1>
