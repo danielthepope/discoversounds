@@ -69,7 +69,7 @@ def update_stats():
     for row in rs:
         last_update = datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f')
         STATS['last_update'] = last_update.strftime('%d %b %Y %H:%M')
-    rs = db_session().execute('select count(vpid) from shows')
+    rs = db_session().execute('select count(vpid) from shows where has_songs = 1')
     for row in rs:
         STATS['show_count'] = row[0]
     STATS['artist_count'] = len(ARTIST_KEYS)
