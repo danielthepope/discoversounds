@@ -27,3 +27,11 @@ def timeit(function):
               function.__name__, args, kw, (end_time - start_time) * 1000)
         return result
     return timed
+
+
+def shorten(thing, limit=30):
+    string = str(thing)
+    if len(string) > limit:
+        return string[0:limit-1] + '…'
+    else:
+        return string
