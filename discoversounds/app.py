@@ -128,8 +128,7 @@ def shutdown_session(exception=None):
     db_session.remove()
 
 
-@timeit
-def find_shows(artists_query, include_local):
+def expand_artist_names(artists_query):
     sanitised_query = set(map(sanitise_artist, artists_query))
     full_artist_names = list()
     for key in sanitised_query:
@@ -137,6 +136,33 @@ def find_shows(artists_query, include_local):
             full_artist_names += ARTIST_NAMES[key][0]
         else:
             full_artist_names.append(key)
+    return full_artist_names
+
+
+def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
+    response = list()
+    for show in shows_to_display:
+        vpid = show.vpid
+        display_item = {
+            'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
+            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
+            'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
+            'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
+            'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
+            'availability_from': show.availability_from.strftime('%d %b'),
+            'availability_to': show.availability_to,
+            'synopsis': show.synopsis,
+            'sid': show.sid in SERVICES and SERVICES[show.sid].name or show.sid,
+            'title': show.title,
+            'vpid': show.vpid,
+        }
+        response.append(display_item)
+    return response
+
+
+@timeit
+def find_shows(artists_query, include_local):
+    full_artist_names = expand_artist_names(artists_query)
     vpids_and_artist = ShowToArtist.query.filter(
         ShowToArtist.artist.in_(full_artist_names)).all()
     if len(vpids_and_artist) == 0:
@@ -150,24 +176,7 @@ def find_shows(artists_query, include_local):
         good_shows = [s for s in good_shows if (s.sid not in SERVICES or not SERVICES[s.sid].local)]
     good_shows.sort(key=lambda show: show.availability_from, reverse=True)
     shows_to_display = good_shows[0:10]  # Up to 10 of the best matches
-    response = list()
-    for show in shows_to_display:
-        vpid = show.vpid
-        display_item = {
-            'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
-            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
-            'count': count,
-            'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
-            'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
-            'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
-            'availability_from': show.availability_from.strftime('%d %b'),
-            'availability_to': show.availability_to,
-            'synopsis': show.synopsis,
-            'sid': show.sid in SERVICES and SERVICES[show.sid].name or show.sid,
-            'title': show.title,
-            'vpid': show.vpid,
-        }
-        response.append(display_item)
+    response = generate_response(shows_to_display, vpids_and_artist, full_artist_names)
     log.info([result['programmes_url'] for result in response])
     return response
 
