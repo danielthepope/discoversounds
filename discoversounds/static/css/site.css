@@ -38,7 +38,7 @@ form {
 }
 
 p {
-    margin: 0 0 10px;
+    margin: 0 0 0.5rem;
 }
 
 a {
@@ -119,4 +119,34 @@ hr {
 
 summary {
     cursor: pointer;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes wipeOut {
+    to {
+        height: 0px;
+        opacity: 0;
+        margin-bottom: -0.5rem;
+    }
+}
+
+.fading {
+    animation-name: fadeOut;
+    animation-duration: 300ms;
+    animation-fill-mode: forwards;
+}
+
+.tosquash {
+    overflow: hidden;
+}
+
+.squashing {
+    animation-name: wipeOut;
+    animation-duration: 300ms;
+    animation-fill-mode: forwards;
 }
