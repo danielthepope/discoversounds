@@ -1,9 +1,9 @@
-FROM python:3
+FROM python:3.7-alpine
 
 WORKDIR /usr/src/app
 # We copy just setup.py first to leverage Docker cache when installing requirements
 COPY ./setup.py .
-RUN pip install ".[prod,test]"
+RUN pip install ".[prod]"
 
 COPY . .
 RUN pip install -e "."
