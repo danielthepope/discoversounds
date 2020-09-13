@@ -19,6 +19,15 @@ class Artist(Base):
     def __str__(self):
         return '<Artist %r>' % (self.artist_name)
 
+    def __eq__(self, other):
+        if not isinstance(other, Artist):
+            return False
+        else:
+            return self.artist_name == other.artist_name
+
+    def __hash__(self):
+        return hash(self.artist_name)
+
 
 class ArtistRelation(Base):
     __tablename__ = 'artist_relations'
@@ -37,6 +46,15 @@ class ArtistRelation(Base):
 
     def __str__(self):
         return '<ArtistRelation %r, %r, (%r)>' % (self.artist1, self.artist2, self.weight)
+
+    def __eq__(self, other):
+        if not isinstance(other, ArtistRelation):
+            return False
+        else:
+            return self.artist1 == other.artist1 and self.artist2 == other.artist2 and self.weight == other.weight
+
+    def __hash__(self):
+        return hash(self.artist1, self.artist2, self.weight)
 
 
 class Show(Base):
@@ -72,6 +90,35 @@ class Show(Base):
     def __str__(self):
         return '<Show %r, %r, %r>' % (self.vpid, self.sid, shorten(self.title))
 
+    def __eq__(self, other):
+        if not isinstance(other, Show):
+            return False
+        else:
+            return (
+                self.vpid == other.vpid and
+                self.epid == other.epid and
+                self.ipid == other.ipid and
+                self.sid == other.sid and
+                self.title == other.title and
+                self.synopsis == other.synopsis and
+                self.availability_from == other.availability_from and
+                self.availability_to == other.availability_to and
+                self.has_songs == other.has_songs
+            )
+
+    def __hash__(self):
+        return hash(
+            self.vpid,
+            self.epid,
+            self.ipid,
+            self.sid,
+            self.title,
+            self.synopsis,
+            self.availability_from,
+            self.availability_to,
+            self.has_songs
+        )
+
 
 class ShowToArtist(Base):
     __tablename__ = 'show_to_artist'
@@ -91,6 +138,15 @@ class ShowToArtist(Base):
     def __repr__(self):
         return 'ShowToArtist(vpid=%r, artist=%r, expiry=%r)' % (self.vpid, self.artist, self.expiry)
 
+    def __eq__(self, other):
+        if not isinstance(other, ShowToArtist):
+            return False
+        else:
+            return self.vpid == other.vpid and self.artist == other.artist and self.expiry == other.expiry
+
+    def __hash__(self):
+        return hash(self.vpid, self.artist, self.expiry)
+
 
 class Service(Base):
     __tablename__ = 'services'
@@ -109,3 +165,12 @@ class Service(Base):
 
     def __repr__(self):
         return 'Service(sid=%r, name=%r, local=%r)' % (self.sid, self.name, self.local)
+
+    def __eq__(self, other):
+        if not isinstance(other, Service):
+            return False
+        else:
+            return self.sid == other.sid and self.name == other.name and self.local == other.local
+
+    def __hash__(self):
+        return hash(self.sid, self.name, self.local)
