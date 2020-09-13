@@ -6,7 +6,7 @@ from discoversounds.helpers import shorten
 
 class Artist(Base):
     __tablename__ = 'artists'
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True, 'sqlite_autoincrement': True}
     artist_id = Column(Integer(), primary_key=True)
     artist_name = Column(String(255))
 
@@ -77,19 +77,19 @@ class ShowToArtist(Base):
     __tablename__ = 'show_to_artist'
     __table_args__ = {'extend_existing': True}
     vpid = Column(String(40), primary_key=True)
-    artist_id = Column(ForeignKey('artists.artist_id'), primary_key=True)
+    artist = Column(ForeignKey('artists.artist_id'), primary_key=True)
     expiry = Column(DateTime())
 
-    def __init__(self, vpid=None, artist_id=None, expiry=None):
+    def __init__(self, vpid=None, artist=None, expiry=None):
         self.vpid = vpid
-        self.artist_id = artist_id
+        self.artist = artist
         self.expiry = expiry
 
     def __str__(self):
-        return '<ShowToArtist %r, %r>' % (self.vpid, shorten(self.artist_id))
+        return '<ShowToArtist %r, %r>' % (self.vpid, shorten(self.artist))
 
     def __repr__(self):
-        return 'ShowToArtist(vpid=%r, artist_id=%r, expiry=%r)' % (self.vpid, self.artist_id, self.expiry)
+        return 'ShowToArtist(vpid=%r, artist=%r, expiry=%r)' % (self.vpid, self.artist, self.expiry)
 
 
 class Service(Base):
