@@ -3,51 +3,61 @@ import pytest
 import json
 from pyquery import PyQuery
 
+
 @pytest.fixture
 def client():
     client = app.test_client()
     yield client
+
 
 def test_homepage(client):
     response = client.get('/')
     assert response.status_code == 200
     assert b'Discover Sounds' in response.data
 
+
 def test_unknown_artist_html(client):
-    response = client.get('/search?artist=sasdf&includelocal=on', headers={'Accept':'text/html'})
+    response = client.get('/search?artist=sasdf&includelocal=on', headers={'Accept': 'text/html'})
     assert response.status_code == 200
     assert b'No results found' in response.data
 
+
 def test_unknown_artist_json(client):
-    response = client.get('/search?artist=sasdf&includelocal=on', headers={'Accept':'application/json'})
+    response = client.get('/search?artist=sasdf&includelocal=on', headers={'Accept': 'application/json'})
     assert response.status_code == 404
     assert b'No results found' in response.data
 
+
 def test_known_artist(client):
-    response = client.get('/search?artist=Take+That&includelocal=on', headers={'Accept':'text/html'})
+    response = client.get('/search?artist=Take+That&includelocal=on', headers={'Accept': 'text/html'})
     print(response.data)
     assert response.status_code == 200
     assert b'Take That' in response.data
 
+
 def test_mix_of_artists(client):
-    response = client.get('/search?artist=sasdf&artist=Take+That&includelocal=on', headers={'Accept':'text/html'})
+    response = client.get('/search?artist=sasdf&artist=Take+That&includelocal=on', headers={'Accept': 'text/html'})
     assert response.status_code == 200
     assert b'sasdf' in response.data
     assert b'Take That' in response.data
 
+
 def test_accept_json(client):
     response = client.get('/search?artist=Take+That&includelocal=on', headers={'Accept': 'application/json'})
     assert json.loads(response.data)
+
 
 def test_accept_html(client):
     response = client.get('/search?artist=Take+That&includelocal=on', headers={'Accept': 'text/html'})
     d = PyQuery(response.data)
     assert d('h1')
 
+
 def test_no_accept_header(client):
     response = client.get('/search?artist=Take+That&includelocal=on')
     d = PyQuery(response.data)
     assert d('h1')
+
 
 def test_redirect(client):
     response = client.get('/search?artist=Take+That&redirect=Play+something+now&includelocal=on')

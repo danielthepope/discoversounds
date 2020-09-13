@@ -7,7 +7,7 @@ Given any number of artists to search for, this service will find a radio show a
 ## Installation
 
 ```
-virtualenv venv
+python3 -m venv venv
 source venv/bin/activate
 pip install -e "."
 ```

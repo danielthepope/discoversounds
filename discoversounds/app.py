@@ -6,7 +6,6 @@ from datetime import datetime
 import logging as log
 import os
 import random
-from functools import reduce
 from string import Template
 
 from flask import Flask, Response, jsonify, redirect, render_template, request
@@ -15,7 +14,7 @@ from sqlalchemy import not_
 
 from discoversounds.database import db_session, init_db
 from discoversounds.helpers import sanitise_artist, set_interval, timeit
-from discoversounds.models import Show, ShowToArtist, Service
+from discoversounds.models import Artist, ArtistRelation, Show, ShowToArtist, Service
 
 log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG)
 
@@ -36,7 +35,7 @@ STATS = {}
 def update_artists():
     global ARTIST_KEYS
     global ARTIST_NAMES
-    all_artists = list([a[0] for a in db_session().query(ShowToArtist.artist).all()])
+    all_artists = [a.artist_name for a in Artist.query.all()]
     db_session.remove()
 
     artist_representations = dict()
@@ -52,6 +51,7 @@ def update_artists():
         popularity = len(artist_representations[key])
         ARTIST_NAMES[key] = (names, popularity)
 
+
 @timeit
 def update_services():
     global SERVICES
@@ -61,6 +61,7 @@ def update_services():
         indexed_services[service.sid] = service
     SERVICES = indexed_services
     db_session.remove()
+
 
 @timeit
 def update_stats():
@@ -98,7 +99,8 @@ class Search(Resource):
         if request.args.get('redirect') and len(results) > 0:
             return redirect(random.choice(results)['sounds_url'])
         # Return HTML
-        return Response(render_template('results.html', results=results, artists_query=artists_query, include_local=include_local), mimetype='text/html')
+        return Response(render_template('results.html', results=results, artists_query=artists_query,
+                                        include_local=include_local), mimetype='text/html')
 
 
 class Artists(Resource):
@@ -143,9 +145,13 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
     response = list()
     for show in shows_to_display:
         vpid = show.vpid
+        matching_artist_ids = [a.artist for a in vpids_and_artist if a.vpid == vpid]
+        matching_artists = [Artist.query.get(a).artist_name for a in matching_artist_ids]
+        other_artists = [Artist.query.get(a[0]).artist_name for a in db_session().query(ShowToArtist.artist)
+                         .filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(matching_artist_ids))).all()]
         display_item = {
-            'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
-            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
+            'artists': matching_artists,
+            'other_artists': other_artists,
             'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
             'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
             'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
@@ -163,8 +169,8 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
 @timeit
 def find_shows(artists_query, include_local):
     full_artist_names = expand_artist_names(artists_query)
-    vpids_and_artist = ShowToArtist.query.filter(
-        ShowToArtist.artist.in_(full_artist_names)).all()
+    artist_ids = [a[0] for a in db_session().query(Artist.artist_id).filter(Artist.artist_name.in_(full_artist_names)).all()]
+    vpids_and_artist = ShowToArtist.query.filter(ShowToArtist.artist.in_(artist_ids)).all()
     if len(vpids_and_artist) == 0:
         return []
     just_vpids = [a.vpid for a in vpids_and_artist]

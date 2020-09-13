@@ -5,8 +5,17 @@ from unidecode import unidecode
 
 log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG)
 
+
 def sanitise_artist(artist):
-    return unidecode(artist).lower().replace(' ', '').replace('.', '').replace(',', '').replace('&', 'and').replace("'", '').replace('"', '').replace('/', '').replace('-', '')
+    return unidecode(artist).lower() \
+        .replace(' ', '') \
+        .replace('.', '') \
+        .replace(',', '') \
+        .replace('&', 'and') \
+        .replace("'", '') \
+        .replace('"', '') \
+        .replace('/', '') \
+        .replace('-', '')
 
 
 def set_interval(func, sec):
@@ -24,7 +33,7 @@ def timeit(function):
         result = function(*args, **kw)
         end_time = time.time()
         log.debug('%r %r %r  %2.2f ms',
-              function.__name__, args, kw, (end_time - start_time) * 1000)
+                  function.__name__, args, kw, (end_time - start_time) * 1000)
         return result
     return timed
 

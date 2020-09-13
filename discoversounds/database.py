@@ -17,4 +17,5 @@ Base.query = db_session.query_property()
 
 def init_db():
     from discoversounds import models
+    log.debug(dir(models))
     Base.metadata.create_all(bind=engine)

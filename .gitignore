@@ -120,3 +120,4 @@ dmypy.json
 
 # Project-specific
 data/
+*.tar.gz
