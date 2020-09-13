@@ -23,10 +23,10 @@ class Artist(Base):
         if not isinstance(other, Artist):
             return False
         else:
-            return self.artist_name == other.artist_name
+            return self.artist_name == other.artist_name and self.artist_id == other.artist_id
 
     def __hash__(self):
-        return hash(self.artist_name)
+        return hash((self.artist_name, self.artist_id))
 
 
 class ArtistRelation(Base):
@@ -54,7 +54,7 @@ class ArtistRelation(Base):
             return self.artist1 == other.artist1 and self.artist2 == other.artist2 and self.weight == other.weight
 
     def __hash__(self):
-        return hash(self.artist1, self.artist2, self.weight)
+        return hash((self.artist1, self.artist2, self.weight))
 
 
 class Show(Base):
@@ -107,7 +107,7 @@ class Show(Base):
             )
 
     def __hash__(self):
-        return hash(
+        return hash((
             self.vpid,
             self.epid,
             self.ipid,
@@ -117,7 +117,7 @@ class Show(Base):
             self.availability_from,
             self.availability_to,
             self.has_songs
-        )
+        ))
 
 
 class ShowToArtist(Base):
@@ -145,7 +145,7 @@ class ShowToArtist(Base):
             return self.vpid == other.vpid and self.artist == other.artist and self.expiry == other.expiry
 
     def __hash__(self):
-        return hash(self.vpid, self.artist, self.expiry)
+        return hash((self.vpid, self.artist, self.expiry))
 
 
 class Service(Base):
@@ -173,4 +173,4 @@ class Service(Base):
             return self.sid == other.sid and self.name == other.name and self.local == other.local
 
     def __hash__(self):
-        return hash(self.sid, self.name, self.local)
+        return hash((self.sid, self.name, self.local))
