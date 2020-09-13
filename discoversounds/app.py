@@ -6,7 +6,6 @@ from datetime import datetime
 import logging as log
 import os
 import random
-from functools import reduce
 from string import Template
 
 from flask import Flask, Response, jsonify, redirect, render_template, request
@@ -52,6 +51,7 @@ def update_artists():
         popularity = len(artist_representations[key])
         ARTIST_NAMES[key] = (names, popularity)
 
+
 @timeit
 def update_services():
     global SERVICES
@@ -61,6 +61,7 @@ def update_services():
         indexed_services[service.sid] = service
     SERVICES = indexed_services
     db_session.remove()
+
 
 @timeit
 def update_stats():
@@ -98,7 +99,8 @@ class Search(Resource):
         if request.args.get('redirect') and len(results) > 0:
             return redirect(random.choice(results)['sounds_url'])
         # Return HTML
-        return Response(render_template('results.html', results=results, artists_query=artists_query, include_local=include_local), mimetype='text/html')
+        return Response(render_template('results.html', results=results, artists_query=artists_query,
+                                        include_local=include_local), mimetype='text/html')
 
 
 class Artists(Resource):
@@ -145,7 +147,8 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
         vpid = show.vpid
         display_item = {
             'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
-            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist).filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
+            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist)
+                              .filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
             'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
             'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
             'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
