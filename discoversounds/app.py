@@ -14,7 +14,7 @@ from sqlalchemy import not_
 
 from discoversounds.database import db_session, init_db
 from discoversounds.helpers import sanitise_artist, set_interval, timeit
-from discoversounds.models import Show, ShowToArtist, Service
+from discoversounds.models import Artist, ArtistRelation, Show, ShowToArtist, Service
 
 log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG)
 
@@ -35,7 +35,7 @@ STATS = {}
 def update_artists():
     global ARTIST_KEYS
     global ARTIST_NAMES
-    all_artists = list([a[0] for a in db_session().query(ShowToArtist.artist).all()])
+    all_artists = [a.artist_name for a in Artist.query.all()]
     db_session.remove()
 
     artist_representations = dict()
@@ -146,8 +146,8 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
     for show in shows_to_display:
         vpid = show.vpid
         display_item = {
-            'artists': [a.artist for a in vpids_and_artist if a.vpid == vpid],
-            'other_artists': [a[0] for a in db_session().query(ShowToArtist.artist)
+            'artists': [Artist.query.get(a.artist).artist_name for a in vpids_and_artist if a.vpid == vpid],
+            'other_artists': [Artist.query.get(a[0]).artist_name for a in db_session().query(ShowToArtist.artist)
                               .filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
             'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
             'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
@@ -166,8 +166,9 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
 @timeit
 def find_shows(artists_query, include_local):
     full_artist_names = expand_artist_names(artists_query)
-    vpids_and_artist = ShowToArtist.query.filter(
-        ShowToArtist.artist.in_(full_artist_names)).all()
+    artists = [Artist.query.filter(Artist.artist_name == name).first() for name in full_artist_names]
+    artist_ids = [a.artist_id for a in artists if a]
+    vpids_and_artist = ShowToArtist.query.filter(ShowToArtist.artist.in_(artist_ids)).all()
     if len(vpids_and_artist) == 0:
         return []
     just_vpids = [a.vpid for a in vpids_and_artist]
