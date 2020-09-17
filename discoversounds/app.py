@@ -145,10 +145,13 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
     response = list()
     for show in shows_to_display:
         vpid = show.vpid
+        matching_artist_ids = [a.artist for a in vpids_and_artist if a.vpid == vpid]
+        matching_artists = [Artist.query.get(a).artist_name for a in matching_artist_ids]
+        other_artists = [Artist.query.get(a[0]).artist_name for a in db_session().query(ShowToArtist.artist)
+                         .filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(matching_artist_ids))).all()]
         display_item = {
-            'artists': [Artist.query.get(a.artist).artist_name for a in vpids_and_artist if a.vpid == vpid],
-            'other_artists': [Artist.query.get(a[0]).artist_name for a in db_session().query(ShowToArtist.artist)
-                              .filter(ShowToArtist.vpid == vpid, not_(ShowToArtist.artist.in_(full_artist_names))).all()],
+            'artists': matching_artists,
+            'other_artists': other_artists,
             'programmes_url': PROGRAMMES_URL.substitute({'show': show.epid}),
             'sounds_url': SOUNDS_URL.substitute({'show': show.epid}),
             'image_url': IMAGE_URL.substitute({'ipid': show.ipid}),
@@ -166,8 +169,7 @@ def generate_response(shows_to_display, vpids_and_artist, full_artist_names):
 @timeit
 def find_shows(artists_query, include_local):
     full_artist_names = expand_artist_names(artists_query)
-    artists = [Artist.query.filter(Artist.artist_name == name).first() for name in full_artist_names]
-    artist_ids = [a.artist_id for a in artists if a]
+    artist_ids = [a[0] for a in db_session().query(Artist.artist_id).filter(Artist.artist_name.in_(full_artist_names)).all()]
     vpids_and_artist = ShowToArtist.query.filter(ShowToArtist.artist.in_(artist_ids)).all()
     if len(vpids_and_artist) == 0:
         return []
