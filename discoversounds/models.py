@@ -9,12 +9,14 @@ class Artist(Base):
     __table_args__ = {'extend_existing': True, 'sqlite_autoincrement': True}
     artist_id = Column(Integer(), primary_key=True)
     artist_name = Column(String(255))
+    popularity = Column(Integer())
 
-    def __init__(self, artist_name=None):
+    def __init__(self, artist_name=None, popularity=0):
         self.artist_name = artist_name
+        self.popularity = popularity
 
     def __repr__(self):
-        return 'Artist(artist_id=%r, artist_name=%r)' % (self.artist_id, self.artist_name)
+        return 'Artist(artist_id=%r, artist_name=%r, popularity=%r)' % (self.artist_id, self.artist_name, self.popularity)
 
     def __str__(self):
         return '<Artist %r>' % (self.artist_name)
@@ -23,10 +25,12 @@ class Artist(Base):
         if not isinstance(other, Artist):
             return False
         else:
-            return self.artist_name == other.artist_name and self.artist_id == other.artist_id
+            return (self.artist_name == other.artist_name and
+                    self.artist_id == other.artist_id and
+                    self.popularity == other.popularity)
 
     def __hash__(self):
-        return hash((self.artist_name, self.artist_id))
+        return hash((self.artist_name, self.artist_id, self.popularity))
 
 
 class ArtistRelation(Base):
