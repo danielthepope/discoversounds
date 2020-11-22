@@ -6,10 +6,20 @@ Given any number of artists to search for, this service will find a radio show a
 
 ## Installation
 
+The back end uses Python with Flask
+
 ```
 python3 -m venv venv
 source venv/bin/activate
 pip install -e "."
+```
+
+The front end is built using Node and React
+
+```
+cd frontend
+npm install
+npm run build
 ```
 
 ### Other dependencies

@@ -7,6 +7,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Flask==1.0.2',
+        'Flask-Cors==3.0.9',
         'Flask-RESTful==0.3.7',
         'python-dotenv==0.10.1',
         'SQLAlchemy==1.3.2',

@@ -3,3 +3,5 @@
 .vscode
 venv
 data
+discoversounds/static
+frontend/node_modules

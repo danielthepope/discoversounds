@@ -3,12 +3,15 @@ load_dotenv()
 
 import collections
 from datetime import datetime
+from functools import reduce
 import logging as log
+from operator import add
 import os
 import random
 from string import Template
 
-from flask import Flask, Response, jsonify, redirect, render_template, request
+from flask import Flask, Response, jsonify, redirect, render_template, request, send_file
+from flask_cors import CORS
 from flask_restful import Api, Resource
 from sqlalchemy import not_
 
@@ -20,6 +23,7 @@ log.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log.DEBUG
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+CORS(app)
 
 PROGRAMMES_URL = Template('https://www.bbc.co.uk/programmes/$show')
 SOUNDS_URL = Template('https://www.bbc.co.uk/sounds/play/$show')
@@ -35,21 +39,25 @@ STATS = {}
 def update_artists():
     global ARTIST_KEYS
     global ARTIST_NAMES
-    all_artists = [a.artist_name for a in Artist.query.all()]
+    all_artists = [a for a in Artist.query.all()]
     db_session.remove()
 
-    artist_representations = dict()
+    artists_with_popularity = dict()
     for artist in all_artists:
-        sanitised_artist = sanitise_artist(artist)
-        if sanitised_artist in artist_representations:
-            artist_representations[sanitised_artist].append(artist)
-        else:
-            artist_representations[sanitised_artist] = list([artist])
-    ARTIST_KEYS = artist_representations.keys()
+        sanitised_artist = sanitise_artist(artist.artist_name)
+        if sanitised_artist not in artists_with_popularity:
+            artists_with_popularity[sanitised_artist] = []
+        artists_with_popularity[sanitised_artist].append((artist.artist_name, artist.popularity))
+
+    ARTIST_KEYS = artists_with_popularity.keys()
+
     for key in ARTIST_KEYS:
-        names = [a[0] for a in collections.Counter(artist_representations[key]).most_common()]
-        popularity = len(artist_representations[key])
-        ARTIST_NAMES[key] = (names, popularity)
+        artists_with_popularity[key].sort(key=lambda a: a[1], reverse=True)
+        names = [a[0] for a in artists_with_popularity[key]]
+        popularity = reduce(add, [a[1] for a in artists_with_popularity[key]])
+        artists_with_popularity[key] = (names, popularity)
+
+    ARTIST_NAMES = artists_with_popularity
 
 
 @timeit
@@ -86,14 +94,14 @@ def update():
 class Search(Resource):
     def get(self):
         artists_query = [a for a in request.args.getlist('artist') if a != '']
-        include_local = request.args.get('includelocal')
+        include_local = request.args.get('includelocal') == 'true'
         output_type = request.headers.get('Accept')
         log.info('Looking for %s', str(artists_query))
         results = find_shows(artists_query, include_local)
         # Return JSON
         if output_type == 'application/json':
             if len(results) == 0:
-                return 'No results found', 404
+                return [], 404
             return jsonify(results)
         # Redirect to Sounds
         if request.args.get('redirect') and len(results) > 0:
@@ -117,12 +125,17 @@ def find_artists(term):
     all_matches = [ARTIST_NAMES[a] for a in ARTIST_KEYS if sanitised in a]
     # Sort by popularity
     all_matches.sort(key=lambda a: a[1], reverse=True)
-    return [a[0][0] for a in all_matches][0:15]
+    return [{'value': a[0][0], 'label': a[0][0]} for a in all_matches][0:15]
 
 
 @app.route('/')
 def index():
-    return Response(render_template('index.html', stats=STATS, include_local=True), mimetype='text/html')
+    return send_file('static/index.html')
+
+
+@app.route('/stats')
+def stats():
+    return jsonify(STATS)
 
 
 @app.teardown_appcontext

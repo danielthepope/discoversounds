@@ -1,12 +1,20 @@
-FROM python:3.7-alpine
+FROM nikolaik/python-nodejs:python3.7-nodejs14-alpine
 
 WORKDIR /usr/src/app
 # We copy just setup.py first to leverage Docker cache when installing requirements
 COPY ./setup.py .
 RUN pip install ".[prod]"
+COPY ./frontend/package* ./frontend/
+WORKDIR /usr/src/app/frontend
+RUN npm install
+WORKDIR /usr/src/app
+
 
 COPY . .
 RUN pip install -e "."
+WORKDIR /usr/src/app/frontend
+RUN npm run build
+WORKDIR /usr/src/app
 
 ENV PYTHONUNBUFFERED TRUE
 ENV REFRESH_DATA TRUE
