@@ -18,7 +18,7 @@ setup(
         'six==1.16.0',
         'SQLAlchemy==1.3.2',
         'Unidecode==1.0.23',
-        'Werkzeug==1.0.1',
+        'Werkzeug==2.2.3',
     ],
     extras_require={
         'dev': [
