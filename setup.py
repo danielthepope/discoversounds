@@ -8,7 +8,7 @@ setup(
     install_requires=[
         'aniso8601==9.0.1',
         'click==7.1.2',
-        'Flask==1.0.2',
+        'Flask==2.3.2',
         'Flask-RESTful==0.3.7',
         'itsdangerous==1.1.0',
         'Jinja2==2.11.3',
